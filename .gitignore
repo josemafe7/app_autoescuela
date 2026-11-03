@@ -1,0 +1,33 @@
+# Claves y contraseñas: nunca se suben
+.env
+.env.*
+!.env.example
+
+# Claves privadas y certificados
+*.pem
+*.key
+
+# Claude Code: aprobaciones personales ("Sí, y no volver a preguntar")
+.claude/settings.local.json
+
+# Nada más de los agentes se ignora: .claude/ (skills, agentes y settings.json), .agents/, AGENTS.md,
+# CLAUDE.md y docs/ son la configuración y la memoria del proyecto, y van en el repositorio.
+
+# Base de datos de la demo: se crea sola al arrancar (y con `pnpm seed`)
+/datos/
+
+# Dependencias y compilación
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Resultados de las pruebas con Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+
+# Sistema
+.DS_Store
+npm-debug.log*

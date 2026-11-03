@@ -1,0 +1,23 @@
+packages:
+  - web
+  - gestion
+  - compartido
+
+# No instala versiones publicadas hace menos de 7 días (ver docs/security.md).
+minimumReleaseAge: 10080
+# Rechaza versiones publicadas con menos garantías que las anteriores.
+trustPolicy: no-downgrade
+# semver@6.3.1 es la versión oficial (npm/node-semver, 2023) que piden los plugins de
+# ESLint; salta el aviso porque se publicó sin la firma de procedencia de las 7.x.
+trustPolicyExclude:
+  - semver@6.3.1
+
+# Scripts de instalación revisados: ninguno hace falta (usan binarios ya compilados).
+allowBuilds:
+  esbuild: false
+  sharp: false
+  unrs-resolver: false
+
+# Next.js 15 trae PostCSS 8.4.31, con avisos de seguridad corregidos a partir de la 8.5.23.
+overrides:
+  postcss: ^8.5.23

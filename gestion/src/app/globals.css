@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-fondo text-tinta antialiased;
+    font-feature-settings: "ss01";
+  }
+  h1, h2, h3 {
+    @apply text-tinta;
+    letter-spacing: -0.015em;
+  }
+  :focus-visible {
+    outline: 2px solid #a33900;
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: #ffdbce;
+  }
+}
+
+@layer components {
+  .cifra {
+    font-variant-numeric: tabular-nums;
+  }
+  .tarjeta {
+    @apply rounded-xl border border-linea bg-superficie;
+  }
+  .btn {
+    @apply inline-flex min-h-[40px] select-none items-center justify-center gap-2 rounded-lg px-4 text-[0.9375rem] font-semibold transition-[background-color,transform,color] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primario {
+    @apply btn bg-faro-600 text-white hover:bg-faro-800;
+  }
+  .btn-oscuro {
+    @apply btn bg-tinta text-white hover:bg-[#213145];
+  }
+  .btn-secundario {
+    @apply btn border border-linea bg-superficie text-tinta hover:bg-hundido;
+  }
+  .btn-suave {
+    @apply btn bg-faro-50 text-faro-800 hover:bg-faro-100;
+  }
+  .btn-peligro {
+    @apply btn border border-rojo-50 bg-superficie text-rojo-600 hover:bg-rojo-50;
+  }
+  .btn-texto {
+    @apply inline-flex items-center gap-1 rounded text-sm font-semibold text-faro-600 hover:text-faro-800;
+  }
+  .btn-sm {
+    @apply min-h-[32px] px-3 text-sm;
+  }
+  .campo {
+    @apply block min-h-[40px] w-full rounded-lg border border-linea bg-superficie px-3 text-[0.9375rem] text-tinta placeholder:text-tenue focus:border-faro-500 focus:outline-none focus:ring-2 focus:ring-faro-100;
+  }
+  textarea.campo {
+    @apply py-2 leading-relaxed;
+  }
+  .etiqueta {
+    @apply mb-1.5 block text-sm font-medium text-tinta;
+  }
+  .ayuda {
+    @apply text-sm text-gris;
+  }
+  .enlace {
+    @apply font-semibold text-tinta underline decoration-linea decoration-2 underline-offset-4 hover:decoration-faro-500;
+  }
+  .tabla {
+    @apply w-full border-collapse text-left text-[0.9375rem];
+  }
+  .tabla th {
+    @apply whitespace-nowrap px-3 pb-2 pt-1 text-[0.8125rem] font-medium text-gris;
+  }
+  .tabla td {
+    @apply border-t border-linea px-3 py-3 align-middle;
+  }
+  .tabla tbody tr {
+    @apply transition-colors hover:bg-fondo;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 450, "GRAD" 0, "opsz" 20;
+  font-size: 20px;
+  line-height: 1;
+  vertical-align: middle;
+  user-select: none;
+}
+.icono-lleno {
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 20;
+}
+
+/* Rayado para plantones en la cinta del día: es una trama, no un degradado */
+.rayado {
+  background-image: repeating-linear-gradient(135deg, rgba(186, 26, 26, 0.18) 0 2px, transparent 2px 6px); /* taste-skill-ignore */
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+.aparecer {
+  animation: aparecer 180ms ease-out;
+}
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.pulso {
+  animation: pulso 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aparecer, .pulso { animation: none; }
+  .btn { transition: none; }
+}
