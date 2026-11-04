@@ -3,6 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 import {
   abrirBD,
   aFila,
+  cerrarBD,
   tieneContactoLaConversacion,
   columna,
   desdeFila,
@@ -92,6 +93,22 @@ describe("Base de datos compartida", () => {
 
 describe("Interesados de la web", () => {
   const datosChat = { origen: "asistente_ia" as const, nombre: "Interesado en chat", telefono: "611222333", sessionId: "s1" };
+
+  it("al subir de versión, si solo faltan campos opcionales, los añade y conserva los datos", () => {
+    guardarInteresado({ origen: "clase_prueba", nombre: "Laura Gómez", telefono: "611 222 333" });
+    cerrarBD();
+    // Simula la base de datos de la versión 1, sin los campos nuevos de los huecos.
+    const vieja = new DatabaseSync(ruta);
+    vieja.exec("ALTER TABLE ofertas_hueco DROP COLUMN avisada_el");
+    vieja.exec("ALTER TABLE ofertas_hueco DROP COLUMN rechazada_por");
+    vieja.exec("PRAGMA user_version = 1");
+    vieja.close();
+
+    const bd = abrirBD();
+    const columnas = (bd.prepare("PRAGMA table_info(ofertas_hueco)").all() as { name: string }[]).map((c) => c.name);
+    expect(columnas).toEqual(expect.arrayContaining(["avisada_el", "rechazada_por"]));
+    expect(bd.prepare("SELECT nombre FROM interesados").all()).toEqual([{ nombre: "Laura Gómez" }]);
+  });
 
   it("lo que guarda la web lo lee cualquier otra conexión al mismo archivo (la gestión)", () => {
     guardarInteresado({ origen: "clase_prueba", nombre: "Laura Gómez", telefono: "611 222 333" });

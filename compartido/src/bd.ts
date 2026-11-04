@@ -8,6 +8,8 @@ import { randomBytes } from "node:crypto";
 import { DatabaseSync, type StatementSync } from "node:sqlite";
 import {
   aFila,
+  columna,
+  definicionColumna,
   desdeFila,
   ESQUEMA_VERSION,
   SQL_TABLAS_FIJAS,
@@ -65,12 +67,35 @@ function versionEsquema(bd: DatabaseSync): number {
   return Number((bd.prepare("PRAGMA user_version").get() as { user_version: number }).user_version);
 }
 
+/**
+ * Si al esquema antiguo solo le faltan campos opcionales, los añade y conserva los datos
+ * (así no se pierden los contactos que ha guardado la web). Si falta algo obligatorio, no toca nada.
+ */
+function completarColumnas(bd: DatabaseSync): boolean {
+  const pendientes: string[] = [];
+  for (const tabla of TABLAS) {
+    const existentes = (bd.prepare(`PRAGMA table_info(${tabla.nombre})`).all() as { name: string }[]).map((c) => c.name);
+    if (!existentes.length) return false;
+    for (const c of tabla.campos) {
+      if (existentes.includes(columna(c.nombre))) continue;
+      if (!c.vacio) return false;
+      pendientes.push(`ALTER TABLE ${tabla.nombre} ADD COLUMN ${definicionColumna(c)}`);
+    }
+  }
+  for (const sql of pendientes) bd.exec(sql);
+  return true;
+}
+
 function prepararEsquema(bd: DatabaseSync) {
   if (versionEsquema(bd) === ESQUEMA_VERSION) return;
   transaccion(bd, () => {
     // Otro proceso puede haberlo preparado mientras esperábamos el turno.
     const version = versionEsquema(bd);
     if (version === ESQUEMA_VERSION) return;
+    if (version !== 0 && completarColumnas(bd)) {
+      bd.exec(`PRAGMA user_version = ${ESQUEMA_VERSION}`);
+      return;
+    }
     if (version !== 0) {
       // Esquema antiguo: la demo solo tiene datos inventados, así que se rehace.
       const tablas = bd

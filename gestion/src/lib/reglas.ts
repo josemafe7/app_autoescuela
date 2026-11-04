@@ -575,8 +575,9 @@ export function ofertasParaAlumno(db: BaseDatos, alumno: Alumno, ahora = new Dat
   const disponibles = db.ofertas
     .filter((o) => {
       if (o.profesorId !== alumno.profesorId || origenDe(o) === alumno.id) return false;
+      if (o.rechazadaPor?.includes(alumno.id)) return false;
       const e = estadoOferta(db, o, ahora);
-      if (e === "abierta") return o.ofrecidaA.includes(alumno.id);
+      if (e === "abierta") return !!o.avisadaEl && o.ofrecidaA.includes(alumno.id);
       if (e === "abierta_todos") return true;
       return false;
     })
@@ -590,6 +591,23 @@ export function ofertasParaAlumno(db: BaseDatos, alumno: Alumno, ahora = new Dat
       inicioPractica(o.fecha, o.inicio) > ahora,
   );
   return { disponibles, cogidas };
+}
+
+/** Huecos que siguen libres, con los alumnos de la lista de espera que encajan y qué ha dicho cada uno. */
+export function huecosLiberados(db: BaseDatos, ahora = new Date()) {
+  return db.ofertas
+    .filter((o) => estadoOferta(db, o, ahora).startsWith("abierta"))
+    .sort((a, b) => (a.fecha + a.inicio).localeCompare(b.fecha + b.inicio))
+    .map((o) => {
+      const origen = db.practicas.find((p) => p.id === o.practicaOrigenId);
+      // Antes de avisar se miran los de ahora (alguien puede haberse apuntado después de la cancelación).
+      const ids = o.avisadaEl ? o.ofrecidaA : candidatosHueco(db, o.profesorId, o.fecha, o.inicio, origen?.alumnoId);
+      const candidatos = ids
+        .map((id) => alumnoPorId(db, id))
+        .filter((a): a is Alumno => !!a)
+        .map((a) => ({ alumno: a, respuesta: o.rechazadaPor?.includes(a.id) ? ("no" as const) : o.avisadaEl ? ("sin_respuesta" as const) : ("sin_avisar" as const) }));
+      return { oferta: o, estado: estadoOferta(db, o, ahora), cancelo: origen ? alumnoPorId(db, origen.alumnoId) : undefined, candidatos };
+    });
 }
 
 // ── Avisos para secretaría ─────────────────────────────────────────────

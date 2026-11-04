@@ -26,7 +26,7 @@ function crearPractica(
   return p;
 }
 
-/** Al quedar libre una hora con tiempo, se ofrece a la lista de espera de ese profesor. */
+/** Al quedar libre una hora con tiempo, queda apuntada para que Secretaría avise a la lista de espera. */
 function lanzarCazaHuecos(db: BaseDatos, p: Practica): number {
   if (inicioPractica(p.fecha, p.inicio) <= new Date()) return 0;
   const candidatos = R.candidatosHueco(db, p.profesorId, p.fecha, p.inicio, p.alumnoId);
@@ -124,9 +124,13 @@ export async function cancelarPractica(f: FormData) {
           ? `Cancelada con menos de ${HORAS_CANCELACION} horas: la práctica se descuenta de tu monedero.`
           : "Cancelada sin devolver la práctica al monedero.";
       }
-      const avisados = lanzarCazaHuecos(db, p);
-      const base = perfil.rol === "alumno" ? "Cancelada a tiempo: la práctica vuelve a tu monedero." : "Cancelada y devuelta al monedero.";
-      return `${base} El hueco se ofrece ${avisados ? `a ${plural(avisados, "alumno")} de la lista de espera` : "a la lista de espera"}.`;
+      const encajan = lanzarCazaHuecos(db, p);
+      if (perfil.rol === "alumno") return "Cancelada a tiempo: la práctica vuelve a tu monedero.";
+      return `Cancelada y devuelta al monedero. ${
+        encajan
+          ? `${plural(encajan, "alumno")} de la lista de espera ${encajan === 1 ? "encaja" : "encajan"}: avísales desde «Hoy».`
+          : "Nadie de la lista de espera encaja; 2 horas antes se ofrecerá a todos sus alumnos."
+      }`;
     });
   });
 }
@@ -187,7 +191,46 @@ export async function aceptarHueco(f: FormData) {
   });
 }
 
+/** El alumno avisado dice que no: deja de verlo y Secretaría lo ve en «Hoy». */
+export async function rechazarHueco(f: FormData) {
+  const volver = rutaSegura(f.get("volver"), "/alumno");
+  await ejecutar(volver, async () => {
+    const perfil = await perfilActual();
+    if (perfil?.rol !== "alumno") throw new ErrorUsuario("Entra como alumno.");
+    const { ofertaId } = leerFormulario(f, z.object({ ofertaId: campo.id("Ese hueco ya no existe.") }));
+    return mutar((db) => {
+      const o = db.ofertas.find((x) => x.id === ofertaId);
+      const a = R.alumnoPorId(db, perfil.id)!;
+      if (!o || !R.ofertasParaAlumno(db, a).disponibles.some((x) => x.id === o.id))
+        throw new ErrorUsuario("Este hueco no está disponible para ti ahora mismo.");
+      o.rechazadaPor = [...(o.rechazadaPor ?? []), a.id];
+      return "Hecho, no te lo guardamos. Te avisaremos del siguiente.";
+    });
+  });
+}
+
 // ── Secretaría ─────────────────────────────────────────────────────────
+
+/** Avisa del hueco a los alumnos de la lista de espera que encajan ahora mismo. */
+export async function avisarListaEspera(f: FormData) {
+  const volver = rutaSegura(f.get("volver"), "/secretaria");
+  await ejecutar(volver, async () => {
+    const perfil = await perfilActual();
+    if (perfil?.rol !== "secretaria") throw new ErrorUsuario("Solo secretaría.");
+    const { ofertaId } = leerFormulario(f, z.object({ ofertaId: campo.id("Ese hueco ya no existe.") }));
+    return mutar((db) => {
+      const o = db.ofertas.find((x) => x.id === ofertaId);
+      if (!o || !R.estadoOferta(db, o).startsWith("abierta")) throw new ErrorUsuario("Ese hueco ya no está libre.");
+      if (o.avisadaEl) throw new ErrorUsuario("Ya avisaste a la lista de espera de este hueco.");
+      const origen = db.practicas.find((p) => p.id === o.practicaOrigenId);
+      const candidatos = R.candidatosHueco(db, o.profesorId, o.fecha, o.inicio, origen?.alumnoId);
+      if (!candidatos.length) throw new ErrorUsuario("Nadie de la lista de espera encaja con ese hueco.");
+      o.ofrecidaA = candidatos;
+      o.avisadaEl = new Date().toISOString();
+      return `${candidatos.length === 1 ? "Avisado" : "Avisados"} ${plural(candidatos.length, "alumno")}: lo verán al entrar en la app y el primero que diga que sí se lo queda.`;
+    });
+  });
+}
 
 /** Secretaría reserva en cualquier hora libre. Sin saldo, solo si lo marca: queda como deuda. */
 export async function reservarComoSecretaria(f: FormData) {

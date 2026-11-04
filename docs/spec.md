@@ -117,10 +117,13 @@ Cada línea es una regla que se puede comprobar: «Cuando pasa esto, la app hace
 - Reserva hasta 14 días vista, de lunes a sábado, sin dejar huecos muertos en la agenda de su profesor:
   si el turno (mañana o tarde) está vacío, solo la primera hora del turno; si ya hay clases, las horas
   pegadas a ellas y la primera y la última del turno. Hace falta tener profesor y prácticas en el monedero.
-- Cancela: con más de 24 horas, la práctica vuelve al monedero y el hueco se ofrece a la lista de espera;
-  con menos, se descuenta.
-- Se apunta a la lista de espera con sus días y franjas. Cuando alguien cancela, el hueco se ofrece a la
-  lista de espera de ese profesor; 2 horas antes, a todos sus alumnos. El primero que lo coge, se lo queda.
+- Cancela: con más de 24 horas, la práctica vuelve al monedero y el hueco queda libre para la lista de
+  espera; con menos, se descuenta.
+- Se apunta a la lista de espera con sus días y franjas. Cuando alguien cancela, Secretaría ve el hueco en
+  «Hoy» con los alumnos de la lista de espera de ese profesor que encajan, y decide si les avisa. Los
+  avisados lo ven en su inicio y responden «Sí, la quiero» o «No, gracias»; Secretaría ve qué ha dicho cada
+  uno. El primero que dice que sí, se lo queda. 2 horas antes, el hueco se ofrece a todos sus alumnos,
+  aunque no se haya avisado.
 - Ve su progreso, su puesto en la cola de examen con una fecha aproximada, sus pagos y deudas, y pide
   recargas a Secretaría.
 
@@ -140,11 +143,12 @@ Lo que no aparece aquí no está permitido.
 - **Visitante de la web:** ver la web, usar la calculadora y el asistente, y enviar los formularios. No
   puede ver ningún dato guardado.
 - **Alumno:** ver solo lo suyo; reservar, confirmar y cancelar sus prácticas; apuntarse a la lista de
-  espera y coger huecos; pedir recargas.
+  espera y aceptar o rechazar los huecos que le ofrecen; pedir recargas.
 - **Profesor:** ver su agenda y a sus alumnos; evaluar sus prácticas (también con la IA) y marcar plantones
   en ellas.
 - **Secretaría:** todo lo de la gestión: alumnos, agenda, cobros, colas, convocatorias, coches, tarifas,
-  interesados y modelo de la IA. También cerrar cualquier práctica y, al cancelar, decidir si se devuelve.
+  interesados y modelo de la IA. También cerrar cualquier práctica y, al cancelar, decidir si se devuelve,
+  y avisar de un hueco liberado a la lista de espera.
 - **Nadie** ve ni cambia la clave de la IA desde la app.
 
 ## Qué datos maneja

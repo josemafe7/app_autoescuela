@@ -7,7 +7,7 @@ import { fechaCorta, fechaLarga, horaFin, mayus, relativo } from "@/lib/fechas";
 import { decimal, eurCorto, plural } from "@/lib/formato";
 import { Alerta, Icono, SemaforoChip, VolverA } from "@/components/ui";
 import { BotonEnviar } from "@/components/BotonEnviar";
-import { aceptarHueco, confirmarPractica } from "@/app/acciones/agenda";
+import { aceptarHueco, confirmarPractica, rechazarHueco } from "@/app/acciones/agenda";
 
 export default async function InicioAlumno() {
   const id = await exigirAlumno();
@@ -36,19 +36,28 @@ export default async function InicioAlumno() {
         return (
           <section key={o.id} className="aparecer rounded-2xl bg-faro-600 p-4 text-white">
             <p className="flex items-center gap-2 text-sm font-semibold text-white/85">
-              <Icono nombre="bolt" lleno /> {abiertoATodos ? "Hueco libre de última hora" : "Ha quedado libre una práctica"}
+              <Icono nombre="bolt" lleno /> {abiertoATodos ? "Hueco libre de última hora" : "Secretaría te avisa: ha quedado libre una práctica"}
             </p>
             <p className="mt-1 text-xl font-bold">
               {mayus(relativo(o.fecha))}, {o.inicio}–{horaFin(o.inicio)}
             </p>
-            <p className="text-sm text-white/85">{mayus(fechaLarga(o.fecha))} con {prof?.nombre}. El primero que la acepta se la queda.</p>
-            <form action={aceptarHueco} className="mt-3">
-              <VolverA ruta={ruta} />
-              <input type="hidden" name="ofertaId" value={o.id} />
-              <BotonEnviar className="btn w-full bg-white text-faro-800 hover:bg-faro-50" pendiente="Reservando…">
-                Quedármela
-              </BotonEnviar>
-            </form>
+            <p className="text-sm text-white/85">{mayus(fechaLarga(o.fecha))} con {prof?.nombre}. ¿La quieres? El primero que dice que sí se la queda.</p>
+            <div className="mt-3 grid grid-cols-[2fr_1fr] gap-2">
+              <form action={aceptarHueco}>
+                <VolverA ruta={ruta} />
+                <input type="hidden" name="ofertaId" value={o.id} />
+                <BotonEnviar className="btn w-full bg-white text-faro-800 hover:bg-faro-50" pendiente="Reservando…">
+                  Sí, la quiero
+                </BotonEnviar>
+              </form>
+              <form action={rechazarHueco}>
+                <VolverA ruta={ruta} />
+                <input type="hidden" name="ofertaId" value={o.id} />
+                <BotonEnviar className="btn w-full border border-white/50 bg-transparent text-white hover:bg-white/10" pendiente="Un momento…">
+                  No, gracias
+                </BotonEnviar>
+              </form>
+            </div>
           </section>
         );
       })}

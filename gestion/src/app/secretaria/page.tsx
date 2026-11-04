@@ -8,6 +8,7 @@ import { Alerta, Avatar, Cabecera, Icono, Insignia, Seccion, tonoDe, Vacio, Volv
 import { CintaDia, cintaDe, Leyenda } from "@/components/CintaDia";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { decidirRetroceso } from "@/app/acciones/alumnos";
+import { avisarListaEspera } from "@/app/acciones/agenda";
 import { ORIGENES_INTERESADO } from "@/lib/tipos";
 
 export default async function PanelSecretaria() {
@@ -33,7 +34,7 @@ export default async function PanelSecretaria() {
     .filter((o) => o.estado === "cogida" && o.fecha >= sumarDias(h, -14))
     .sort((a, b) => (b.cogidaEl ?? "").localeCompare(a.cogidaEl ?? ""));
   const nuevos = R.interesadosNuevos(db).sort((a, b) => b.fecha.localeCompare(a.fecha));
-  const huecosAbiertos = db.ofertas.filter((o) => R.estadoOferta(db, o).startsWith("abierta"));
+  const huecos = R.huecosLiberados(db);
 
   const hallazgo = [
     sinCerrar.length && plural(sinCerrar.length, "práctica sin cerrar", "prácticas sin cerrar"),
@@ -99,12 +100,61 @@ export default async function PanelSecretaria() {
             <div className="mt-4">
               <Leyenda />
             </div>
-            {huecosAbiertos.length > 0 && (
-              <p className="mt-3 text-sm text-gris">
-                {plural(huecosAbiertos.length, "hueco ofrecido", "huecos ofrecidos")} ahora mismo a la lista de espera.
-              </p>
-            )}
           </section>
+
+          {/* Huecos que deja una cancelación: avisar a la lista de espera para no perder la práctica */}
+          {huecos.length > 0 && (
+            <Seccion titulo={<>Huecos liberados <span className="font-normal text-gris">· avisa a la lista de espera</span></>}>
+              <ul className="tarjeta divide-y divide-linea">
+                {huecos.map(({ oferta: o, estado, cancelo, candidatos }) => {
+                  const prof = R.profesorPorId(db, o.profesorId)!;
+                  const porAvisar = !o.avisadaEl && candidatos.length > 0;
+                  return (
+                    <li key={o.id} className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-start">
+                      <div className="min-w-0 flex-1">
+                        <p className="flex flex-wrap items-center gap-2 font-semibold">
+                          {mayus(relativo(o.fecha))} a las {o.inicio} con {prof.nombre}
+                          {estado === "abierta_todos" && <Insignia tono="ambar">Abierto a todos sus alumnos</Insignia>}
+                        </p>
+                        <p className="text-sm text-gris">
+                          {cancelo ? `Lo ha dejado ${cancelo.nombre}` : "Práctica cancelada"} · {fechaLarga(o.fecha)}
+                          {o.avisadaEl && ` · avisados el ${fechaHora(o.avisadaEl)}`}
+                        </p>
+                        {candidatos.length === 0 ? (
+                          <p className="mt-1.5 text-sm text-gris">
+                            Nadie de la lista de espera encaja con ese día y franja. 2 horas antes se ofrecerá a todos sus alumnos.
+                          </p>
+                        ) : (
+                          <ul className="mt-2 flex flex-wrap gap-1.5">
+                            {candidatos.map(({ alumno: a, respuesta }) => (
+                              <li key={a.id}>
+                                <Insignia tono={respuesta === "sin_respuesta" ? "faro" : "neutro"}>
+                                  {a.nombre} {a.apellidos.split(" ")[0]}
+                                  <span className="font-normal">
+                                    · {respuesta === "no" ? "no le interesa" : respuesta === "sin_respuesta" ? "avisado, sin responder" : "sin avisar"}
+                                  </span>
+                                </Insignia>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      {porAvisar && (
+                        <form action={avisarListaEspera} className="shrink-0">
+                          <VolverA ruta="/secretaria" />
+                          <input type="hidden" name="ofertaId" value={o.id} />
+                          <BotonEnviar className="btn-primario btn-sm" pendiente="Avisando…">
+                            <Icono nombre="campaign" className="!text-[18px]" />
+                            Avisar a {plural(candidatos.length, "alumno")}
+                          </BotonEnviar>
+                        </form>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </Seccion>
+          )}
 
           {/* Decisiones de examen */}
           {(retrocesos.length > 0 || cola.tasaPendiente.length > 0 || convPendientes.length > 0 || convSinResultado.length > 0) && (

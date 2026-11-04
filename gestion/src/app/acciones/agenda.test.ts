@@ -11,9 +11,11 @@ import { BLOQUES, Practica } from "@/lib/tipos";
 import { aISO, esDomingo, hoy, inicioPractica, sumarDias } from "@/lib/fechas";
 import {
   aceptarHueco,
+  avisarListaEspera,
   cancelarPractica,
   guardarListaEspera,
   marcarNoPresentado,
+  rechazarHueco,
   reservarComoAlumno,
   reservarComoSecretaria,
 } from "./agenda";
@@ -117,7 +119,8 @@ describe("Lista de espera y caza-huecos", () => {
     expect((await enviar(ANA, guardarListaEspera, { dias: ["1"], franjas: ["tarde"] })).error).toBe("Entra como alumno.");
   });
 
-  it("el hueco que deja una cancelación lo coge quien está en la lista de espera de ese profesor, y nadie más", async () => {
+  /** Sofía cancela una práctica con Marta dentro de unos días y queda el hueco. */
+  async function huecoDeSofia() {
     const { fecha, inicio } = await horaLibreDe("p3", 3);
     const p: Practica = {
       id: "de_sofia", alumnoId: "a27", profesorId: "p3", cocheId: "c3", fecha, inicio, estado: "reservada",
@@ -125,7 +128,37 @@ describe("Lista de espera y caza-huecos", () => {
     };
     await mutar((db) => void db.practicas.push(p));
     await enviar(SECRETARIA, cancelarPractica, { practicaId: p.id, devolver: "si" });
-    const oferta = (await leer()).ofertas.find((o) => o.practicaOrigenId === p.id)!;
+    return { fecha, inicio, oferta: (await leer()).ofertas.find((o) => o.practicaOrigenId === p.id)! };
+  }
+
+  it("el hueco no lo ve nadie hasta que Secretaría avisa a la lista de espera, y solo Secretaría puede avisar", async () => {
+    const { oferta } = await huecoDeSofia();
+    expect(R.ofertasParaAlumno(await leer(), R.alumnoPorId(await leer(), "a26")!).disponibles).toHaveLength(0);
+    expect((await enviar(RUBEN, aceptarHueco, { ofertaId: oferta.id })).error).toBe("Este hueco no está disponible para ti ahora mismo.");
+    expect(R.huecosLiberados(await leer()).find((h) => h.oferta.id === oferta.id)?.candidatos.map((c) => c.respuesta)).toEqual(["sin_avisar"]);
+
+    expect((await enviar(RUBEN, avisarListaEspera, { ofertaId: oferta.id })).error).toBe("Solo secretaría.");
+    expect((await enviar(ANA, avisarListaEspera, { ofertaId: oferta.id })).error).toBe("Solo secretaría.");
+    expect((await enviar(SECRETARIA, avisarListaEspera, { ofertaId: oferta.id })).ok).toMatch(/Avisado 1 alumno/);
+    expect((await enviar(SECRETARIA, avisarListaEspera, { ofertaId: oferta.id })).error).toMatch(/Ya avisaste/);
+    expect(R.ofertasParaAlumno(await leer(), R.alumnoPorId(await leer(), "a26")!).disponibles.map((o) => o.id)).toEqual([oferta.id]);
+  });
+
+  it("el alumno avisado puede decir que no: deja de verlo y Secretaría lo sabe", async () => {
+    const { oferta } = await huecoDeSofia();
+    await enviar(SECRETARIA, avisarListaEspera, { ofertaId: oferta.id });
+    expect((await enviar(LUCIA, rechazarHueco, { ofertaId: oferta.id })).error).toBe("Este hueco no está disponible para ti ahora mismo.");
+    expect((await enviar(RUBEN, rechazarHueco, { ofertaId: oferta.id })).ok).toMatch(/no te lo guardamos/);
+    const db = await leer();
+    expect(R.ofertasParaAlumno(db, R.alumnoPorId(db, "a26")!).disponibles).toHaveLength(0);
+    expect(R.huecosLiberados(db).find((h) => h.oferta.id === oferta.id)?.candidatos.map((c) => c.respuesta)).toEqual(["no"]);
+    expect((await enviar(RUBEN, aceptarHueco, { ofertaId: oferta.id })).error).toBe("Este hueco no está disponible para ti ahora mismo.");
+  });
+
+  it("el hueco que deja una cancelación lo coge quien está en la lista de espera de ese profesor, y nadie más", async () => {
+    const { fecha, inicio, oferta: antes } = await huecoDeSofia();
+    await enviar(SECRETARIA, avisarListaEspera, { ofertaId: antes.id });
+    const oferta = (await leer()).ofertas.find((o) => o.id === antes.id)!;
     expect(oferta.ofrecidaA).toContain("a26");
 
     expect((await enviar(LUCIA, aceptarHueco, { ofertaId: oferta.id })).error).toBe("Este hueco no está disponible para ti ahora mismo.");

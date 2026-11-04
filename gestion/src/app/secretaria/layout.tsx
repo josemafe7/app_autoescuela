@@ -12,7 +12,7 @@ export default async function LayoutSecretaria({ children }: { children: React.R
   const grupos: GrupoNav[] = [
     {
       items: [
-        { href: "/secretaria", texto: "Hoy", icono: "today", exacto: true },
+        { href: "/secretaria", texto: "Hoy", icono: "today", exacto: true, cuenta: R.huecosLiberados(db).filter((h) => !h.oferta.avisadaEl && h.candidatos.length > 0).length },
         { href: "/secretaria/agenda", texto: "Agenda", icono: "calendar_view_week" },
         { href: "/secretaria/alumnos", texto: "Alumnos", icono: "group" },
       ],

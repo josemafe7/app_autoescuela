@@ -237,6 +237,10 @@ export interface OfertaHueco {
   cogidaEl?: string;
   practicaNuevaId?: string;
   abiertaATodos?: boolean;
+  /** Cuándo avisó Secretaría a la lista de espera. Hasta entonces, el hueco no lo ve ningún alumno. */
+  avisadaEl?: string;
+  /** Alumnos avisados que han dicho que no lo quieren. */
+  rechazadaPor?: string[];
 }
 
 export interface PlazaExamen {

@@ -25,7 +25,7 @@ export interface Tabla {
 }
 
 /** Sube cuando cambia el esquema: la base de datos de la demo se vuelve a crear. */
-export const ESQUEMA_VERSION = 1;
+export const ESQUEMA_VERSION = 2;
 
 type Extra = Pick<Campo, "vacio" | "ref">;
 const NULO: Extra = { vacio: "nulo" };
@@ -210,6 +210,8 @@ export const TABLAS: Tabla[] = [
       texto("cogidaEl", OPCIONAL),
       ref("practicaNuevaId", "practicas", OPCIONAL),
       booleano("abiertaATodos", OPCIONAL),
+      texto("avisadaEl", OPCIONAL),
+      json("rechazadaPor", OPCIONAL),
     ],
   },
   {
@@ -246,7 +248,7 @@ const TIPOS_SQL: Record<TipoCampo, string> = {
 
 // Los nombres de tablas y columnas salen de este archivo, nunca de lo que escribe
 // una persona: los valores siempre van como parámetros (?).
-function definicionColumna(c: Campo): string {
+export function definicionColumna(c: Campo): string {
   const col = columna(c.nombre);
   let def = `${col} ${TIPOS_SQL[c.tipo]}`;
   if (c.nombre === "id") def += " NOT NULL PRIMARY KEY";

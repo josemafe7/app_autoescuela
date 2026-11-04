@@ -106,7 +106,7 @@ export async function DetallePractica({
             <form action={cancelarPractica} className="mt-4 flex flex-wrap gap-2">
               <VolverA ruta={ruta} />
               <input type="hidden" name="practicaId" value={p.id} />
-              <BotonEnviar name="devolver" value="si" className="btn-secundario" confirmar="¿Cancelar y devolver la práctica al monedero? El hueco se ofrecerá a la lista de espera.">
+              <BotonEnviar name="devolver" value="si" className="btn-secundario" confirmar="¿Cancelar y devolver la práctica al monedero? Después podrás avisar del hueco a la lista de espera desde «Hoy».">
                 Cancelar y devolver
               </BotonEnviar>
               <BotonEnviar name="devolver" value="no" className="btn-peligro" confirmar="¿Cancelar descontando la práctica (como una cancelación tardía)?">
@@ -181,7 +181,7 @@ export async function DetallePractica({
       )}
 
       {p.estado === "no_presentado" && <Alerta tono="rojo" icono="person_off" titulo={`${a.nombre} no se presentó`}>La práctica se descontó de su monedero.</Alerta>}
-      {p.estado === "cancelada" && <Alerta tono="neutro" icono="event_busy" titulo="Cancelada a tiempo">{p.canceladaEl && `El ${fechaHora(p.canceladaEl)}. `}La práctica volvió al monedero y el hueco se ofreció a la lista de espera.</Alerta>}
+      {p.estado === "cancelada" && <Alerta tono="neutro" icono="event_busy" titulo="Cancelada a tiempo">{p.canceladaEl && `El ${fechaHora(p.canceladaEl)}. `}La práctica volvió al monedero y el hueco quedó libre para avisar a la lista de espera.</Alerta>}
       {p.estado === "cancelada_tarde" && <Alerta tono="ambar" icono="event_busy" titulo="Cancelada con menos de 24 horas">{p.canceladaEl && `El ${fechaHora(p.canceladaEl)}. `}La práctica se descontó del monedero.</Alerta>}
     </div>
   );
