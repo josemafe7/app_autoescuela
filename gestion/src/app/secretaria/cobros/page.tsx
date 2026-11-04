@@ -54,7 +54,7 @@ export default async function Cobros({ searchParams }: { searchParams: Promise<{
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <Link href={`${ruta}?solicitud=${s.id}#registrar`} className="btn-oscuro btn-sm">Registrar pago</Link>
+                        <Link href={`${ruta}?solicitud=${s.id}#registrar`} className="btn-secundario btn-sm">Registrar pago</Link>
                         <form action={descartarSolicitud}>
                           <VolverA ruta={ruta} />
                           <input type="hidden" name="solicitudId" value={s.id} />
@@ -94,7 +94,7 @@ export default async function Cobros({ searchParams }: { searchParams: Promise<{
                           <span className="block text-[0.8125rem] text-gris">{d.cargo.concepto}</span>
                         </td>
                         <td className="cifra whitespace-nowrap text-gris">{fechaCorta(d.cargo.fecha)}</td>
-                        <td className="cifra text-right font-semibold text-rojo-600">{eurCorto(d.pendiente)}</td>
+                        <td className="cifra text-right font-semibold">{eurCorto(d.pendiente)}</td>
                         <td className="pr-5">
                           <form action={cobrarPendiente} className="flex justify-end gap-2">
                             <VolverA ruta={ruta} />
@@ -105,7 +105,7 @@ export default async function Cobros({ searchParams }: { searchParams: Promise<{
                                 <option key={v} value={v}>{t}</option>
                               ))}
                             </select>
-                            <BotonEnviar className="btn-oscuro btn-sm">Cobrar</BotonEnviar>
+                            <BotonEnviar className="btn-secundario btn-sm">Cobrar</BotonEnviar>
                           </form>
                         </td>
                       </tr>

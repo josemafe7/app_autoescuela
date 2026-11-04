@@ -49,7 +49,7 @@ export default async function ListaEspera() {
           <legend className="etiqueta">¿Qué días podrías venir?</legend>
           <div className="grid grid-cols-3 gap-2">
             {DIAS.map((d, i) => (
-              <label key={d} className="flex min-h-[44px] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold ring-1 ring-linea has-[:checked]:bg-tinta has-[:checked]:text-white has-[:checked]:ring-tinta">
+              <label key={d} className="flex min-h-[44px] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold border border-linea has-[:checked]:border-tinta has-[:checked]:bg-tinta has-[:checked]:text-white">
                 <input type="checkbox" name="dias" value={i + 1} defaultChecked={le ? le.dias.includes(i + 1) : false} className="sr-only" />
                 {d}
               </label>
@@ -63,7 +63,7 @@ export default async function ListaEspera() {
               ["manana", "Mañana", "8:00 – 14:00"],
               ["tarde", "Tarde", "16:00 – 20:30"],
             ].map(([v, t, h]) => (
-              <label key={v} className="flex min-h-[56px] cursor-pointer flex-col items-center justify-center rounded-lg ring-1 ring-linea has-[:checked]:bg-tinta has-[:checked]:text-white has-[:checked]:ring-tinta">
+              <label key={v} className="flex min-h-[56px] cursor-pointer flex-col items-center justify-center rounded-lg border border-linea has-[:checked]:border-tinta has-[:checked]:bg-tinta has-[:checked]:text-white">
                 <input type="checkbox" name="franjas" value={v} defaultChecked={le ? le.franjas.includes(v as "manana" | "tarde") : false} className="sr-only" />
                 <span className="text-sm font-semibold">{t}</span>
                 <span className="text-xs opacity-75">{h}</span>

@@ -26,24 +26,31 @@ export default async function MiDia({ searchParams }: { searchParams: Promise<{ 
 
   return (
     <div className="flex flex-col gap-6">
+      <header>
+        <h1 className="text-2xl font-bold">Mi día</h1>
+        <p className="mt-1 text-[0.9375rem] text-gris">
+          {sinCerrar.length ? `${plural(sinCerrar.length, "práctica")} por cerrar: evalúalas al acabar cada clase` : "Todas tus prácticas están cerradas"}
+        </p>
+      </header>
+
       {sinCerrar.length > 0 && (
         <section>
-          <h1 className="sr-only">Mi día</h1>
-          <h2 className="mb-2 text-base font-bold">Por cerrar <span className="font-normal text-gris">· {plural(sinCerrar.length, "práctica")}</span></h2>
-          <ul className="flex flex-col gap-2">
+          <h2 className="mb-2 text-base font-semibold">
+            Por cerrar <span className="font-normal text-gris">· falta evaluar</span>
+          </h2>
+          <ul className="tarjeta divide-y divide-linea">
             {sinCerrar.map((p) => {
               const a = R.alumnoPorId(db, p.alumnoId)!;
               return (
                 <li key={p.id}>
-                  <Link href={`/profesor/practica/${p.id}`} className="flex items-center gap-3 rounded-xl bg-ambar-50 px-4 py-3 text-ambar-800 active:scale-[0.99]">
-                    <Icono nombre="edit_note" className="!text-[26px]" />
+                  <Link href={`/profesor/practica/${p.id}`} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-fondo">
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{R.nombreCompleto(a)}</span>
-                      <span className="block text-sm">
-                        {mayus(relativo(p.fecha))} a las {p.inicio} · falta evaluar
+                      <span className="block text-sm text-gris">
+                        {mayus(relativo(p.fecha))} a las {p.inicio}
                       </span>
                     </span>
-                    <span className="btn-oscuro btn-sm">Evaluar</span>
+                    <span className="btn-secundario btn-sm shrink-0">Evaluar</span>
                   </Link>
                 </li>
               );
@@ -58,8 +65,7 @@ export default async function MiDia({ searchParams }: { searchParams: Promise<{ 
             <Icono nombre="chevron_left" />
           </Link>
           <div className="text-center">
-            {sinCerrar.length === 0 && <h1 className="sr-only">Mi día</h1>}
-            <p className="text-lg font-bold">{fecha === h ? "Hoy" : mayus(relativo(fecha))}</p>
+            <h2 className="text-lg font-bold">{fecha === h ? "Hoy" : mayus(relativo(fecha))}</h2>
             <p className="text-sm text-gris">{mayus(fechaLarga(fecha))}</p>
           </div>
           <Link href={`/profesor?fecha=${siguiente}`} className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-hundido" aria-label="Día siguiente">
@@ -108,7 +114,7 @@ export default async function MiDia({ searchParams }: { searchParams: Promise<{ 
                       const a = R.alumnoPorId(db, p.alumnoId)!;
                       const terminada = yaTerminada(p.fecha, p.inicio);
                       const estado =
-                        p.estado === "realizada" ? <Insignia tono="oscuro">Hecha</Insignia>
+                        p.estado === "realizada" ? <Insignia tono="neutro">Hecha</Insignia>
                         : p.estado === "no_presentado" ? <Insignia tono="rojo">No vino</Insignia>
                         : terminada ? <Insignia tono="ambar">Por cerrar</Insignia>
                         : p.confirmada ? <Insignia tono="verde">Confirmada</Insignia>

@@ -10,14 +10,9 @@ export function FormLogin() {
 
   return (
     <div className="tarjeta p-6 sm:p-8">
-      <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-faro-600 text-white">
-          <Icono nombre="lock" />
-        </span>
-        <div>
-          <h2 className="text-lg font-bold">Iniciar sesión</h2>
-          <p className="text-sm text-gris">Introduce tu correo electrónico y tu contraseña</p>
-        </div>
+      <div>
+        <h2 className="text-lg font-bold">Iniciar sesión</h2>
+        <p className="text-sm text-gris">Introduce tu correo electrónico y tu contraseña</p>
       </div>
 
       <form action={iniciarSesion} className="mt-6 flex flex-col gap-4">

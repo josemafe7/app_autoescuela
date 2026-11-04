@@ -24,7 +24,7 @@ const TONOS: Record<Tono, string> = {
 
 export function Insignia({ tono = "neutro", children, className = "" }: { tono?: Tono; children: React.ReactNode; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[0.8125rem] font-semibold ${TONOS[tono]} ${className}`}>
+    <span className={`inline-flex flex-none items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold leading-5 ${TONOS[tono]} ${className}`}>
       {children}
     </span>
   );
@@ -46,7 +46,8 @@ export function SemaforoPunto({ valor }: { valor: Semaforo }) {
   return <span title={SEMAFOROS[valor]} className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${PUNTO[valor]}`} />;
 }
 
-const TONO_NIVEL: Record<Nivel, Tono> = { por_trabajar: "rojo", en_progreso: "ambar", dominada: "verde" };
+// Lo dominado va en gris: el color se queda para lo que falta, que es lo que hay que mirar.
+const TONO_NIVEL: Record<Nivel, Tono> = { por_trabajar: "rojo", en_progreso: "ambar", dominada: "neutro" };
 
 export function NivelChip({ nivel }: { nivel: Nivel }) {
   return <Insignia tono={TONO_NIVEL[nivel]}>{NIVELES[nivel]}</Insignia>;
@@ -57,20 +58,21 @@ export function Barra({ valor, total, tono = "faro" }: { valor: number; total: n
   const pct = total > 0 ? Math.min(100, Math.max(0, (valor / total) * 100)) : 0;
   const color = tono === "verde" ? "bg-verde-600" : tono === "tinta" ? "bg-tinta" : "bg-faro-600";
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-faro-50" role="presentation">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-hundido" role="presentation">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
     </div>
   );
 }
 
+/** Bloque vacío: conserva su sitio con un marco discontinuo y una frase, sin dibujos. */
 export function Vacio({ icono = "inbox", titulo, children }: { icono?: string; titulo: string; children?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-start gap-1 rounded-xl bg-hundido/60 px-5 py-5">
-      <p className="flex items-center gap-2 font-semibold text-tinta">
-        <Icono nombre={icono} className="text-gris" />
-        {titulo}
-      </p>
-      {children && <div className="text-sm text-gris">{children}</div>}
+    <div className="flex items-start gap-2.5 rounded-xl border border-dashed border-control px-4 py-3">
+      <Icono nombre={icono} className="mt-px !text-[18px] text-tenue" />
+      <div className="min-w-0 text-sm">
+        <p className="font-semibold text-tinta">{titulo}</p>
+        {children && <div className="mt-0.5 text-gris">{children}</div>}
+      </div>
     </div>
   );
 }
@@ -91,7 +93,7 @@ export function Seccion({
   return (
     <section className={className} id={id}>
       <div className="mb-3 flex items-end justify-between gap-3">
-        <h2 className="text-base font-bold">{titulo}</h2>
+        <h2 className="text-base font-semibold">{titulo}</h2>
         {accion}
       </div>
       {children}
@@ -184,20 +186,16 @@ export function Alerta({
   children?: React.ReactNode;
   accion?: React.ReactNode;
 }) {
-  const fondo = {
-    faro: "bg-faro-50 text-faro-800",
-    verde: "bg-verde-50 text-verde-800",
-    ambar: "bg-ambar-50 text-ambar-800",
-    rojo: "bg-rojo-50 text-rojo-800",
-    neutro: "bg-hundido text-tinta",
-  }[tono];
+  // El color va en el icono, no en todo el bloque; solo el aviso ámbar lleva su tinte, porque pide atención.
+  const marca = { faro: "text-faro-600", verde: "text-verde-600", ambar: "text-ambar-600", rojo: "text-rojo-600", neutro: "text-gris" }[tono];
+  const fondo = tono === "ambar" ? "border-[#f3dfae] bg-[#fffbeb]" : "border-linea bg-superficie";
   return (
-    <div className={`flex flex-col gap-3 rounded-xl px-4 py-3.5 sm:flex-row sm:items-center ${fondo}`}>
+    <div className={`flex flex-col gap-3 rounded-xl border px-4 py-3.5 sm:flex-row sm:items-center ${fondo}`}>
       <div className="flex flex-1 items-start gap-3">
-        <Icono nombre={icono} className="mt-0.5" />
+        <Icono nombre={icono} className={`mt-0.5 ${marca}`} />
         <div className="min-w-0">
-          <p className="font-semibold leading-snug">{titulo}</p>
-          {children && <div className="mt-0.5 text-sm leading-relaxed opacity-90">{children}</div>}
+          <p className="font-semibold leading-snug text-tinta">{titulo}</p>
+          {children && <div className="mt-0.5 text-sm leading-relaxed text-gris">{children}</div>}
         </div>
       </div>
       {accion && <div className="flex shrink-0 gap-2 pl-8 sm:pl-0">{accion}</div>}

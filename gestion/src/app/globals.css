@@ -7,7 +7,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-fondo text-tinta antialiased;
+    @apply bg-marco text-tinta antialiased;
     font-feature-settings: "ss01";
   }
   h1, h2, h3 {
@@ -31,7 +31,7 @@
     @apply rounded-xl border border-linea bg-superficie;
   }
   .btn {
-    @apply inline-flex min-h-[40px] select-none items-center justify-center gap-2 rounded-lg px-4 text-[0.9375rem] font-semibold transition-[background-color,transform,color] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex min-h-[40px] select-none items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-[background-color,border-color,transform,color] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
   }
   .btn-primario {
     @apply btn bg-faro-600 text-white hover:bg-faro-800;
@@ -40,13 +40,13 @@
     @apply btn bg-tinta text-white hover:bg-[#213145];
   }
   .btn-secundario {
-    @apply btn border border-linea bg-superficie text-tinta hover:bg-hundido;
+    @apply btn border border-control bg-superficie text-tinta hover:border-[#b8c1ce] hover:bg-hundido;
   }
   .btn-suave {
     @apply btn bg-faro-50 text-faro-800 hover:bg-faro-100;
   }
   .btn-peligro {
-    @apply btn border border-rojo-50 bg-superficie text-rojo-600 hover:bg-rojo-50;
+    @apply btn border border-[#efc3bd] bg-superficie text-rojo-600 hover:bg-rojo-50;
   }
   .btn-texto {
     @apply inline-flex items-center gap-1 rounded text-sm font-semibold text-faro-600 hover:text-faro-800;
@@ -54,8 +54,9 @@
   .btn-sm {
     @apply min-h-[32px] px-3 text-sm;
   }
+  /* 16 px en el móvil para que el iPhone no amplíe la pantalla al escribir */
   .campo {
-    @apply block min-h-[40px] w-full rounded-lg border border-linea bg-superficie px-3 text-[0.9375rem] text-tinta placeholder:text-tenue focus:border-faro-500 focus:outline-none focus:ring-2 focus:ring-faro-100;
+    @apply block min-h-[40px] w-full rounded-lg border border-control bg-superficie px-3 text-base text-tinta placeholder:text-tenue focus:border-faro-500 focus:outline-none focus:ring-2 focus:ring-faro-100 sm:text-[0.9375rem];
   }
   textarea.campo {
     @apply py-2 leading-relaxed;

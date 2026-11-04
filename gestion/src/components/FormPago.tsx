@@ -59,7 +59,7 @@ export function FormPago({
             ["1", "Un pago"],
             ["2", "Dos plazos"],
           ].map(([v, t]) => (
-            <label key={v} className="relative flex min-h-[36px] cursor-pointer items-center justify-center rounded-md text-sm font-semibold text-gris has-[:checked]:bg-superficie has-[:checked]:text-tinta has-[:checked]:ring-1 has-[:checked]:ring-linea">
+            <label key={v} className="relative flex min-h-[36px] cursor-pointer items-center justify-center rounded-md text-sm font-semibold text-gris has-[:checked]:bg-superficie has-[:checked]:text-tinta border border-transparent has-[:checked]:border-linea">
               <input type="radio" name="plazos" value={v} defaultChecked={v === "1"} className="sr-only" />
               {t}
             </label>
@@ -75,7 +75,7 @@ export function FormPago({
         <legend className="etiqueta">Cómo ha pagado</legend>
         <div className="grid grid-cols-3 gap-1 rounded-lg bg-hundido p-1">
           {Object.entries(FORMAS_PAGO).map(([v, t]) => (
-            <label key={v} className="relative flex min-h-[36px] cursor-pointer items-center justify-center rounded-md text-sm font-semibold text-gris has-[:checked]:bg-superficie has-[:checked]:text-tinta has-[:checked]:ring-1 has-[:checked]:ring-linea">
+            <label key={v} className="relative flex min-h-[36px] cursor-pointer items-center justify-center rounded-md text-sm font-semibold text-gris has-[:checked]:bg-superficie has-[:checked]:text-tinta border border-transparent has-[:checked]:border-linea">
               <input type="radio" name="forma" value={v} defaultChecked={v === "bizum"} className="sr-only" />
               {t}
             </label>

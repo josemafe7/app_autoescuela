@@ -163,7 +163,14 @@ export function FormEvaluacion(props: Props) {
             }`}
             aria-label={escuchando ? "Parar el dictado" : "Empezar a dictar"}
           >
-            <Icono nombre={escuchando ? "stop" : "mic"} lleno className="!text-[30px]" />
+            {/* En SVG y no con la fuente de iconos: la barra fija de guardar pasa por encima sin tapar texto */}
+            <svg aria-hidden viewBox="0 0 24 24" className="h-[30px] w-[30px]" fill="currentColor">
+              {escuchando ? (
+                <rect x="6" y="6" width="12" height="12" rx="2" />
+              ) : (
+                <path d="M12 14.5a3.5 3.5 0 0 0 3.5-3.5V5.5a3.5 3.5 0 0 0-7 0V11a3.5 3.5 0 0 0 3.5 3.5Zm5.5-3.5a5.5 5.5 0 0 1-11 0H5a7 7 0 0 0 6 6.93V21h2v-3.07A7 7 0 0 0 19 11h-1.5Z" />
+              )}
+            </svg>
           </button>
           <div className="text-sm">
             {escuchando ? (
@@ -266,7 +273,7 @@ export function FormEvaluacion(props: Props) {
         </div>
       </section>
 
-      <div className="sticky bottom-[72px] z-10 -mx-4 flex flex-col gap-2 border-t border-linea bg-fondo/95 px-4 py-3 md:bottom-0">
+      <div className="sticky bottom-[72px] z-10 -mx-4 flex flex-col gap-2 border-t border-linea bg-superficie px-4 py-3 sm:mx-0 sm:px-0 lg:bottom-0">
         <p className="flex items-center gap-2 text-sm">
           <span className={`h-2.5 w-2.5 rounded-full ${punto}`} />
           {previa.texto}

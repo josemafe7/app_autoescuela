@@ -52,9 +52,9 @@ function Fila({ titulo, descripcion, children }: { titulo: string; descripcion: 
     <section className="grid gap-4 py-8 first:pt-0 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-10">
       <div>
         <h2 className="text-base font-semibold">{titulo}</h2>
-        <p className="mt-1 text-sm text-gris">{descripcion}</p>
+        <p className="mt-1 break-words text-sm text-gris">{descripcion}</p>
       </div>
-      <div className="rounded-2xl bg-superficie p-5 ring-1 ring-linea">{children}</div>
+      <div className="min-w-0 rounded-2xl bg-hundido p-4 sm:p-5">{children}</div>
     </section>
   );
 }

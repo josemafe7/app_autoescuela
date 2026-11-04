@@ -1,23 +1,25 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Colores del sistema «Luz y Asfalto» (el mismo de la web pública).
- * Regla de la app: el naranja de la marca, a tope solo en marcas pequeñas
- * (botón principal, dato principal, icono activo); sus tintes pálidos hacen
- * el trabajo de las áreas (fila activa del menú, insignias, barras de progreso).
+ * Colores de «Luz y Asfalto» (los mismos tonos que la web pública), en el estilo de hoja sobre marco:
+ * el menú y la barra de arriba son un marco gris azulado, el asfalto, y el trabajo va en una hoja
+ * blanca. El naranja del faro va solo en los datos y en la acción principal, nunca en el marco.
  */
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
+        marco: "#eef1f6",
         fondo: "#f8f9ff",
         superficie: "#ffffff",
-        hundido: "#eff4ff",
+        hundido: "#f3f5f9",
+        activo: "#e1e6ee",
         tinta: "#0b1c30",
         gris: "#4f5b6e",
-        tenue: "#7a8597",
-        linea: "#e3e8f2",
+        tenue: "#5f6b7f",
+        linea: "#e5e9f0",
+        control: "#cfd6e0",
         faro: {
           50: "#fff6f1",
           100: "#ffeadf",
@@ -36,7 +38,7 @@ const config: Config = {
       borderRadius: {
         DEFAULT: "0.375rem",
         lg: "0.5rem",
-        xl: "0.75rem",
+        xl: "0.625rem",
         "2xl": "1rem",
       },
     },

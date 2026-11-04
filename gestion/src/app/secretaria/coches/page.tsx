@@ -136,7 +136,7 @@ export default async function Coches() {
                 <legend className="etiqueta">Motivo</legend>
                 <div className="grid grid-cols-2 gap-1 rounded-lg bg-hundido p-1">
                   {[["taller", "Taller"], ["itv", "ITV"]].map(([v, t]) => (
-                    <label key={v} className="flex min-h-[36px] cursor-pointer items-center justify-center rounded-md text-sm font-semibold text-gris has-[:checked]:bg-superficie has-[:checked]:text-tinta has-[:checked]:ring-1 has-[:checked]:ring-linea">
+                    <label key={v} className="flex min-h-[36px] cursor-pointer items-center justify-center rounded-md text-sm font-semibold text-gris has-[:checked]:bg-superficie has-[:checked]:text-tinta border border-transparent has-[:checked]:border-linea">
                       <input type="radio" name="tipo" value={v} defaultChecked={v === "taller"} className="sr-only" />
                       {t}
                     </label>

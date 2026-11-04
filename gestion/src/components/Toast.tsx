@@ -49,7 +49,7 @@ export function Toast() {
   if (!mensaje) return null;
   const esError = mensaje.tipo === "error";
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center px-4 md:bottom-6">
+    <div className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center px-4 lg:bottom-6">
       <div
         role={esError ? "alert" : "status"}
         data-toast={mensaje.tipo}

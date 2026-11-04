@@ -54,7 +54,7 @@ export default async function Interesado({ params }: { params: Promise<{ id: str
               <ol className="tarjeta flex flex-col gap-3 p-4">
                 {i.conversacion.map((m, k) => (
                   <li key={k} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <p className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[0.9375rem] leading-relaxed ${m.role === "user" ? "rounded-br-md bg-faro-600 text-white" : "rounded-bl-md bg-hundido text-tinta"}`}>
+                    <p className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[0.9375rem] leading-relaxed ${m.role === "user" ? "rounded-br-md bg-faro-100 text-faro-800" : "rounded-bl-md bg-hundido text-tinta"}`}>
                       <span className="sr-only">{m.role === "user" ? "Interesado: " : "Asistente: "}</span>
                       {m.content}
                     </p>
@@ -97,7 +97,7 @@ export default async function Interesado({ params }: { params: Promise<{ id: str
                   name="estado"
                   value={e}
                   disabled={e === "matriculado" && !i.alumnoId}
-                  className={`btn btn-sm ${i.estado === e ? "bg-faro-50 text-faro-800" : "text-gris hover:bg-hundido"}`}
+                  className={`btn btn-sm ${i.estado === e ? "bg-activo text-tinta" : "text-gris hover:bg-hundido"}`}
                   pendiente="…"
                 >
                   {ESTADOS_INTERESADO[e]}

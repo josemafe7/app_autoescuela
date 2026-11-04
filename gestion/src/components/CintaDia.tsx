@@ -58,14 +58,17 @@ export function cintaDe(
   });
 }
 
+// Cada estado con su marca, para leerlos de un vistazo: el naranja del faro solo en lo reservado
+// (lo que viene), un gris más oscuro para lo ya dado, un borde ámbar en lo que falta cerrar, una
+// trama en los plantones, un borde discontinuo en el hueco ofrecido y un gris suave en lo libre.
 const ESTILO: Record<TipoBloque, string> = {
-  libre: "bg-superficie text-tenue border border-dashed border-linea",
-  pasado: "bg-hundido/50 text-tenue",
-  reservada: "bg-faro-100 text-faro-800",
-  sin_cerrar: "bg-ambar-50 text-ambar-800 ring-1 ring-inset ring-ambar-600/40",
-  realizada: "bg-tinta text-white",
+  libre: "bg-hundido text-tenue",
+  pasado: "bg-hundido/40 text-tenue",
+  reservada: "bg-faro-200 text-faro-800",
+  sin_cerrar: "border border-ambar-600 bg-[#fffbeb] text-ambar-800",
+  realizada: "bg-[#dde3eb] text-tinta",
   no_presentado: "rayado bg-rojo-50 text-rojo-800",
-  hueco: "bg-superficie text-faro-800 border-2 border-dashed border-faro-500",
+  hueco: "border-2 border-dashed border-faro-500 bg-superficie text-faro-800",
 };
 
 export const LEYENDA: { tipo: TipoBloque; texto: string }[] = [
@@ -80,7 +83,7 @@ export const LEYENDA: { tipo: TipoBloque; texto: string }[] = [
 function Bloque({ b, compacta }: { b: BloqueCinta; compacta?: boolean }) {
   const contenido = compacta ? null : (
     <>
-      <span className="cifra hidden text-[0.6875rem] font-semibold opacity-75 sm:block">{b.inicio}</span>
+      <span className="cifra hidden text-[0.6875rem] font-semibold sm:block">{b.inicio}</span>
       {b.texto && <span className="hidden truncate text-[0.75rem] font-semibold leading-tight sm:block">{b.texto}</span>}
     </>
   );

@@ -91,16 +91,16 @@ export default async function InicioAlumno() {
       {a.fase === "teorico" && (
         <section className="tarjeta p-4">
           <h2 className="text-base font-bold">Tu teórico</h2>
-          <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-lg bg-hundido p-3">
+          <dl className="mt-3 grid grid-cols-3 divide-x divide-linea rounded-lg border border-linea text-center">
+            <div className="p-3">
               <dt className="text-xs text-gris">Test hechos</dt>
               <dd className="cifra text-xl font-semibold">{a.teorico.numTests}</dd>
             </div>
-            <div className="rounded-lg bg-hundido p-3">
+            <div className="p-3">
               <dt className="text-xs text-gris">Fallos (últ. 5)</dt>
               <dd className="cifra text-xl font-semibold">{decimal(a.teorico.mediaFallos)}</dd>
             </div>
-            <div className="rounded-lg bg-hundido p-3">
+            <div className="p-3">
               <dt className="text-xs text-gris">Último test</dt>
               <dd className="text-sm font-semibold leading-7">{a.teorico.ultimoTest ? mayus(relativo(a.teorico.ultimoTest)) : "—"}</dd>
             </div>
@@ -134,10 +134,7 @@ export default async function InicioAlumno() {
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="text-sm text-gris">Prácticas en tu monedero</p>
-              <p className={`cifra text-[2.5rem] font-bold leading-none ${m.disponibles <= 1 ? "text-rojo-600" : ""}`}>{m.disponibles}</p>
-              <p className="mt-1 text-sm text-gris">
-                {m.realizadas} hechas{m.reservadas ? ` · ${plural(m.reservadas, "reservada")}` : ""}
-              </p>
+              <p className={`cifra mt-1 text-[2.25rem] font-bold leading-none ${m.disponibles <= 1 ? "text-rojo-600" : ""}`}>{m.disponibles}</p>
             </div>
             {a.fase === "practicas" && m.disponibles > 0 && (
               <Link href="/alumno/reservar" className="btn-primario">
@@ -145,6 +142,7 @@ export default async function InicioAlumno() {
               </Link>
             )}
           </div>
+          <TiraMonedero m={m} />
           {m.disponibles <= 1 && a.fase === "practicas" && (
             <div className="mt-3 flex flex-col gap-2 rounded-lg bg-faro-50 p-3 text-sm text-faro-800 sm:flex-row sm:items-center sm:justify-between">
               <span>
@@ -176,7 +174,7 @@ export default async function InicioAlumno() {
       )}
 
       {ultima?.mensajeAlumno && (
-        <section className="rounded-2xl bg-hundido/70 p-4">
+        <section className="rounded-xl bg-hundido p-4">
           <p className="text-sm text-gris">{prof?.nombre} te dejó una nota · {relativo(ultima.fecha)}</p>
           <p className="mt-1 leading-relaxed">«{ultima.mensajeAlumno}»</p>
         </section>
@@ -211,6 +209,36 @@ export default async function InicioAlumno() {
           <p className="mt-1">Aprobaste el {a.aprobadoEl ? fechaLarga(a.aprobadoEl) : "práctico"}. Gracias por confiar en Autoescuela Faro. Si te ha gustado, cuéntaselo a tus amigos.</p>
         </section>
       )}
+    </div>
+  );
+}
+
+/** El monedero en una tira: cada práctica comprada es una casilla, y la leyenda usa las mismas marcas. */
+function TiraMonedero({ m }: { m: R.Monedero }) {
+  const partes = [
+    { n: m.realizadas, texto: "hechas", clase: "bg-[#c9d1dc]" },
+    { n: m.perdidas, texto: "perdidas", clase: "rayado bg-rojo-50" },
+    { n: m.reservadas, texto: m.reservadas === 1 ? "reservada" : "reservadas", clase: "bg-faro-600" },
+    { n: Math.max(0, m.disponibles), texto: "por reservar", clase: "border border-faro-500 bg-faro-50" },
+  ];
+  const total = partes.reduce((s, p) => s + p.n, 0);
+  if (total === 0 || total > 60) return null;
+  const resumen = partes.filter((p) => p.n > 0).map((p) => `${p.n} ${p.texto}`).join(", ");
+  return (
+    <div className="mt-4">
+      <div className="flex gap-[3px]" role="img" aria-label={`Tu monedero: ${resumen}`}>
+        {partes.flatMap((p, i) => Array.from({ length: p.n }, (_, k) => <span key={`${i}-${k}`} className={`h-4 min-w-0 flex-1 rounded-[3px] ${p.clase}`} />))}
+      </div>
+      <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] text-gris">
+        {partes
+          .filter((p) => p.n > 0)
+          .map((p) => (
+            <li key={p.texto} className="flex items-center gap-1.5">
+              <span className={`inline-block h-3 w-3 rounded-[3px] ${p.clase}`} />
+              <span className="cifra font-semibold text-tinta">{p.n}</span> {p.texto}
+            </li>
+          ))}
+      </ul>
     </div>
   );
 }

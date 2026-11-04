@@ -134,7 +134,7 @@ export default async function FichaAlumno({ params }: { params: Promise<{ id: st
                   <input type="hidden" name="alumnoId" value={a.id} />
                   <p className="font-semibold">Progreso en la app de test</p>
                   {R.teoricoParado(a) && (
-                    <p className="rounded-lg bg-rojo-50 px-3 py-2 text-sm text-rojo-800">
+                    <p className="rounded-lg border border-[#f3dfae] bg-[#fffbeb] px-3 py-2 text-sm text-ambar-800">
                       {R.diasSinTest(a)} días sin hacer test: aparece como parado en el panel.
                     </p>
                   )}
@@ -167,7 +167,7 @@ export default async function FichaAlumno({ params }: { params: Promise<{ id: st
                   </div>
                   <p className="ayuda">{conv.tasa ? `Le ${conv.disponibles === 1 ? "queda 1 convocatoria" : `quedan ${conv.disponibles} convocatorias`}. Un suspenso gasta una.` : "Primero registra el pago de la tasa de la DGT."}</p>
                   <div className="flex gap-2">
-                    <BotonEnviar name="resultado" value="apto" className="btn-primario" disabled={!conv.tasa || conv.agotadas}>Apto</BotonEnviar>
+                    <BotonEnviar name="resultado" value="apto" className="btn-secundario" disabled={!conv.tasa || conv.agotadas}>Apto</BotonEnviar>
                     <BotonEnviar name="resultado" value="no_apto" className="btn-peligro" disabled={!conv.tasa || conv.agotadas} confirmar="¿Registrar suspenso? Gasta una convocatoria.">No apto</BotonEnviar>
                   </div>
                 </form>
@@ -279,7 +279,7 @@ export default async function FichaAlumno({ params }: { params: Promise<{ id: st
                             </Link>
                           </td>
                           <td className="whitespace-nowrap">
-                            <Insignia tono={p.estado === "realizada" ? "oscuro" : p.estado === "no_presentado" ? "rojo" : p.estado === "cancelada_tarde" ? "ambar" : sinCerrar ? "ambar" : p.estado === "reservada" ? "faro" : "neutro"}>
+                            <Insignia tono={p.estado === "realizada" ? "neutro" : p.estado === "no_presentado" ? "rojo" : p.estado === "cancelada_tarde" ? "ambar" : sinCerrar ? "ambar" : p.estado === "reservada" ? "faro" : "neutro"}>
                               {sinCerrar ? "Sin cerrar" : ESTADOS_PRACTICA[p.estado]}
                             </Insignia>
                             {p.sinSaldo && <Insignia tono="rojo" className="ml-1">Sin saldo</Insignia>}
@@ -301,12 +301,12 @@ export default async function FichaAlumno({ params }: { params: Promise<{ id: st
           <Seccion titulo="Pagos y deudas" id="pagos">
             <div className="flex flex-col gap-4">
               {deudas.map((d) => (
-                <div key={d.cargo.id} className="flex flex-col gap-3 rounded-xl bg-rojo-50 px-4 py-3.5 text-rojo-800 sm:flex-row sm:items-center">
+                <div key={d.cargo.id} className="flex flex-col gap-3 rounded-xl border border-linea px-4 py-3.5 sm:flex-row sm:items-center">
                   <div className="flex-1">
                     <p className="font-semibold">
                       {R.MOTIVOS_DEUDA[d.motivo]}: <span className="cifra">{eurCorto(d.pendiente)}</span>
                     </p>
-                    <p className="text-sm opacity-90">{d.cargo.concepto} · {fechaCorta(d.cargo.fecha)}</p>
+                    <p className="text-sm text-gris">{d.cargo.concepto} · {fechaCorta(d.cargo.fecha)}</p>
                   </div>
                   <form action={cobrarPendiente} className="flex gap-2">
                     <VolverA ruta={`${ruta}#pagos`} />
@@ -317,7 +317,7 @@ export default async function FichaAlumno({ params }: { params: Promise<{ id: st
                         <option key={v} value={v}>{t}</option>
                       ))}
                     </select>
-                    <BotonEnviar className="btn-oscuro btn-sm">Cobrar</BotonEnviar>
+                    <BotonEnviar className="btn-secundario btn-sm">Cobrar</BotonEnviar>
                   </form>
                 </div>
               ))}

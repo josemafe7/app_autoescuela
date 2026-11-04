@@ -19,7 +19,7 @@ export default async function PracticaSecretaria({
   const p = db.practicas.find((x) => x.id === id);
   if (!p) notFound();
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto max-w-2xl">
       <Cabecera
         antes={<Volver href={`/secretaria/agenda?fecha=${p.fecha}`}>Agenda del {fechaLarga(p.fecha)}</Volver>}
         titulo="Práctica"

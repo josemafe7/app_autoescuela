@@ -3,7 +3,8 @@
 Cómo se decide el aspecto de la app, cómo se encarga el diseño a una herramienta de fuera y cómo se aplica
 después. El diseño sale de la especificación, nunca al revés: por eso se hace con `docs/spec.md` aprobada.
 
-Las pantallas ya tienen diseño («Luz y Asfalto», hecho con Google Stitch): sus reglas están en `DESIGN.md`.
+Las pantallas ya tienen diseño («Luz y Asfalto»: la web, hecha con Google Stitch; la gestión, rehecha con la
+skill de diseño en el estilo de hoja sobre marco): sus reglas están en `DESIGN.md`.
 Lo que sigue se usa cuando quiera cambiar el aspecto o diseñar pantallas nuevas fuera.
 
 ## Tres caminos

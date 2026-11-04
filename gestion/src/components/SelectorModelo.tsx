@@ -88,7 +88,12 @@ export function SelectorModelo({ actual }: { actual: string }) {
                 >
                   <td className="px-3 py-2">
                     <span className="flex items-center gap-2">
-                      <Icono nombre={activo ? "radio_button_checked" : "radio_button_unchecked"} className={activo ? "text-faro-600" : "text-tenue"} />
+                      <span
+                        aria-hidden
+                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 ${activo ? "border-faro-600" : "border-control"}`}
+                      >
+                        {activo && <span className="h-2 w-2 rounded-full bg-faro-600" />}
+                      </span>
                       <span className="min-w-0">
                         <span className="block truncate font-semibold">{m.nombre}</span>
                         <span className="block truncate text-xs text-gris">{m.id}</span>

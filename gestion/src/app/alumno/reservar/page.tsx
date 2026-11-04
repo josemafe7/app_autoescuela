@@ -65,7 +65,7 @@ export default async function Reservar({ searchParams }: { searchParams: Promise
       )}
 
       {/* Días */}
-      <nav aria-label="Elige día" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <nav aria-label="Elige día" className="flex gap-2 overflow-x-auto pb-1">
         {disponiblesPorDia.map((d) => {
           const activo = d.fecha === elegido.fecha;
           const n = d.bloques.length;
@@ -75,7 +75,7 @@ export default async function Reservar({ searchParams }: { searchParams: Promise
               href={`/alumno/reservar?fecha=${d.fecha}`}
               aria-current={activo ? "date" : undefined}
               className={`flex w-[60px] shrink-0 flex-col items-center rounded-xl py-2 ${
-                activo ? "bg-tinta text-white" : n ? "bg-superficie ring-1 ring-linea" : "bg-hundido/50 text-tenue"
+                activo ? "border border-tinta bg-tinta text-white" : n ? "border border-linea bg-superficie" : "border border-transparent bg-hundido text-tenue"
               }`}
             >
               <span className="text-xs font-semibold capitalize">{diaCorto(d.fecha)}</span>

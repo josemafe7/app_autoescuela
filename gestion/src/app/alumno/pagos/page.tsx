@@ -68,7 +68,7 @@ export default async function PagosAlumno() {
             <fieldset className="flex flex-col gap-2">
               <legend className="etiqueta">¿Qué quieres recargar?</legend>
               {recargables.map((t, i) => (
-                <label key={t.id} className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 ring-1 ring-linea has-[:checked]:bg-faro-50 has-[:checked]:ring-faro-500">
+                <label key={t.id} className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 border border-linea has-[:checked]:border-faro-500 has-[:checked]:bg-faro-50">
                   <input type="radio" name="tarifaId" value={t.id} defaultChecked={solicitud ? solicitud.tarifaId === t.id : i === recargables.length - 2} className="h-4 w-4 accent-faro-600" />
                   <span className="flex-1">
                     <span className="block font-semibold">{t.concepto}</span>

@@ -4,7 +4,7 @@ import { exigirSecretaria } from "@/lib/perfil";
 import * as R from "@/lib/reglas";
 import { esDomingo, fechaCorta, fechaHora, fechaLarga, hoy, mayus, relativo, sumarDias } from "@/lib/fechas";
 import { decimal, eurCorto, plural } from "@/lib/formato";
-import { Alerta, Avatar, Barra, Cabecera, Icono, Insignia, Seccion, tonoDe, Vacio, VolverA } from "@/components/ui";
+import { Alerta, Avatar, Cabecera, Icono, Insignia, Seccion, tonoDe, Vacio, VolverA } from "@/components/ui";
 import { CintaDia, cintaDe, Leyenda } from "@/components/CintaDia";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { decidirRetroceso } from "@/app/acciones/alumnos";
@@ -46,12 +46,7 @@ export default async function PanelSecretaria() {
     <>
       <Cabecera
         titulo="Hoy"
-        subtitulo={
-          <>
-            {mayus(fechaLarga(h))}
-            {hallazgo.length ? ` · ${hallazgo.join(", ")}` : " · todo al día"}
-          </>
-        }
+        subtitulo={hallazgo.length ? mayus(hallazgo.join(", ")) : "Todo al día"}
         acciones={
           <>
             <Link href="/secretaria/agenda" className="btn-secundario">
@@ -117,11 +112,11 @@ export default async function PanelSecretaria() {
               <div className="flex flex-col gap-2">
                 {convSinResultado.map((c) => (
                   <Alerta key={c.id} tono="faro" icono="fact_check" titulo={`Faltan los resultados del examen del ${fechaLarga(c.fecha)}`}
-                    accion={<Link href={`/secretaria/examenes/${c.id}`} className="btn-oscuro btn-sm">Registrar resultados</Link>} />
+                    accion={<Link href={`/secretaria/examenes/${c.id}`} className="btn-secundario btn-sm">Registrar resultados</Link>} />
                 ))}
                 {convPendientes.map((c) => (
                   <Alerta key={c.id} tono="faro" icono="flag" titulo={`Convocatoria del ${fechaLarga(c.fecha)} sin confirmar`}
-                    accion={<Link href={`/secretaria/examenes/${c.id}`} className="btn-oscuro btn-sm">Ver propuesta</Link>}>
+                    accion={<Link href={`/secretaria/examenes/${c.id}`} className="btn-secundario btn-sm">Ver propuesta</Link>}>
                     La app propone a los primeros de la cola que cumplen los requisitos. Cupo: {plural(c.cupo, "plaza")}.
                   </Alerta>
                 ))}
@@ -148,116 +143,120 @@ export default async function PanelSecretaria() {
             </Seccion>
           )}
 
-          <div className="grid gap-8 lg:grid-cols-2">
-            <Seccion titulo={<>Teórico parado <span className="font-normal text-gris">· 7 días o más sin test</span></>}>
-              {parados.length === 0 ? (
-                <Vacio icono="check_circle" titulo="Nadie parado">Todos los alumnos de teórico han hecho test esta semana.</Vacio>
-              ) : (
-                <ul className="tarjeta divide-y divide-linea">
-                  {parados.map((a) => {
-                    const dias = R.diasSinTest(a);
-                    const texto = `¡Hola, ${a.nombre}! Te escribimos de Autoescuela Faro. Hemos visto que llevas ${dias} días sin hacer test del teórico. ¿Va todo bien? Si te atasca algún tema, pásate por la oficina y lo repasamos juntos. ¡Ánimo, que ya queda menos!`;
-                    return (
-                      <li key={a.id} className="flex items-center gap-3 px-4 py-3">
-                        <div className="min-w-0 flex-1">
-                          <Link href={`/secretaria/alumnos/${a.id}`} className="block truncate font-semibold hover:underline">{R.nombreCompleto(a)}</Link>
-                          <p className="text-sm text-gris">
-                            <span className="cifra font-semibold text-rojo-600">{dias} días</span>
-                            {a.teorico.ultimoTest ? " sin test" : " sin ningún test"}
-                            {a.teorico.mediaFallos !== null && ` · ${decimal(a.teorico.mediaFallos)} fallos de media`}
-                          </p>
-                        </div>
-                        <a href={R.enlaceWhatsApp(a.telefono, texto)} target="_blank" rel="noreferrer" className="btn-secundario btn-sm">
-                          <Icono nombre="chat" className="!text-[18px]" /> WhatsApp
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Seccion>
+          {/* Dos columnas que terminan a la par: lo que hay que cerrar y lo que se ha rellenado, y a quién hay que escribir */}
+          <div className="grid items-start gap-8 lg:grid-cols-2">
+            <div className="flex flex-col gap-8">
+              <Seccion titulo={<>Prácticas sin cerrar <span className="font-normal text-gris">· falta evaluar</span></>}>
+                {sinCerrar.length === 0 ? (
+                  <Vacio icono="task_alt" titulo="Todas cerradas">Los profesores han evaluado todas las prácticas.</Vacio>
+                ) : (
+                  <ul className="tarjeta divide-y divide-linea">
+                    {sinCerrar.slice(0, 6).map((p) => {
+                      const a = R.alumnoPorId(db, p.alumnoId)!;
+                      const prof = R.profesorPorId(db, p.profesorId)!;
+                      return (
+                        <li key={p.id}>
+                          <Link href={`/secretaria/practicas/${p.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-fondo">
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-semibold">{R.nombreCompleto(a)}</p>
+                              <p className="text-sm text-gris">
+                                Con {prof.nombre} · {mayus(relativo(p.fecha))} a las {p.inicio}
+                              </p>
+                            </div>
+                            <Icono nombre="chevron_right" className="text-tenue" />
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </Seccion>
 
-            <Seccion titulo={<>Prácticas sin cerrar <span className="font-normal text-gris">· falta evaluar</span></>}>
-              {sinCerrar.length === 0 ? (
-                <Vacio icono="task_alt" titulo="Todas cerradas">Los profesores han evaluado todas las prácticas.</Vacio>
-              ) : (
-                <ul className="tarjeta divide-y divide-linea">
-                  {sinCerrar.slice(0, 6).map((p) => {
-                    const a = R.alumnoPorId(db, p.alumnoId)!;
-                    const prof = R.profesorPorId(db, p.profesorId)!;
-                    return (
-                      <li key={p.id}>
-                        <Link href={`/secretaria/practicas/${p.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-fondo">
+              <Seccion titulo={<>Huecos rellenados <span className="font-normal text-gris">· caza-huecos, últimos 14 días</span></>}>
+                {rellenados.length === 0 ? (
+                  <Vacio icono="event_available" titulo="Aún ninguno">Cuando un alumno de la lista de espera coja un hueco, aparecerá aquí.</Vacio>
+                ) : (
+                  <ul className="tarjeta divide-y divide-linea">
+                    {rellenados.slice(0, 6).map((o) => {
+                      const quien = R.alumnoPorId(db, o.cogidaPor!)!;
+                      const origen = db.practicas.find((p) => p.id === o.practicaOrigenId);
+                      const cancelo = origen ? R.alumnoPorId(db, origen.alumnoId) : undefined;
+                      const prof = R.profesorPorId(db, o.profesorId)!;
+                      const minutos = o.cogidaEl ? Math.max(1, Math.round((new Date(o.cogidaEl).getTime() - new Date(o.creadaEl).getTime()) / 60000)) : null;
+                      return (
+                        <li key={o.id} className="px-4 py-3">
+                          <p className="font-semibold">
+                            {quien.nombre} cogió el hueco de {cancelo?.nombre ?? "otro alumno"}
+                          </p>
+                          <p className="text-sm text-gris">
+                            {fechaCorta(o.fecha)} a las {o.inicio} con {prof.nombre}
+                            {minutos !== null && ` · en ${minutos < 60 ? `${minutos} min` : `${Math.round(minutos / 60)} h`}`}
+                            {o.abiertaATodos && " · abierto a todos"}
+                          </p>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </Seccion>
+            </div>
+            <div className="flex flex-col gap-8">
+              <Seccion titulo={<>Teórico parado <span className="font-normal text-gris">· 7 días o más sin test</span></>}>
+                {parados.length === 0 ? (
+                  <Vacio icono="check_circle" titulo="Nadie parado">Todos los alumnos de teórico han hecho test esta semana.</Vacio>
+                ) : (
+                  <ul className="tarjeta divide-y divide-linea">
+                    {parados.map((a) => {
+                      const dias = R.diasSinTest(a);
+                      const texto = `¡Hola, ${a.nombre}! Te escribimos de Autoescuela Faro. Hemos visto que llevas ${dias} días sin hacer test del teórico. ¿Va todo bien? Si te atasca algún tema, pásate por la oficina y lo repasamos juntos. ¡Ánimo, que ya queda menos!`;
+                      return (
+                        <li key={a.id} className="flex items-center gap-3 px-4 py-3">
                           <div className="min-w-0 flex-1">
-                            <p className="truncate font-semibold">{R.nombreCompleto(a)}</p>
+                            <Link href={`/secretaria/alumnos/${a.id}`} className="block truncate font-semibold hover:underline">{R.nombreCompleto(a)}</Link>
                             <p className="text-sm text-gris">
-                              Con {prof.nombre} · {mayus(relativo(p.fecha))} a las {p.inicio}
+                              <span className="cifra font-semibold text-tinta">{dias} días</span>
+                              {a.teorico.ultimoTest ? " sin test" : " sin ningún test"}
+                              {a.teorico.mediaFallos !== null && ` · ${decimal(a.teorico.mediaFallos)} fallos de media`}
                             </p>
                           </div>
-                          <Icono nombre="chevron_right" className="text-tenue" />
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Seccion>
+                          <a href={R.enlaceWhatsApp(a.telefono, texto)} target="_blank" rel="noreferrer" className="btn-secundario btn-sm">
+                            <Icono nombre="chat" className="!text-[18px]" /> WhatsApp
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </Seccion>
 
-            <Seccion titulo={<>Monedero casi vacío <span className="font-normal text-gris">· 1 práctica o ninguna</span></>}>
-              {saldoBajo.length === 0 ? (
-                <Vacio titulo="Nadie con el monedero vacío" />
-              ) : (
-                <ul className="tarjeta divide-y divide-linea">
-                  {saldoBajo.slice(0, 5).map((a) => {
-                    const s = R.saldo(db, a.id);
-                    const pidio = solicitudes.some((x) => x.alumnoId === a.id);
-                    const texto = `¡Hola, ${a.nombre}! Te escribimos de Autoescuela Faro: ${s === 1 ? "te queda 1 práctica" : "no te quedan prácticas"} en tu bono. Puedes recargar por Bizum o en la oficina para seguir reservando desde la app.`;
-                    return (
-                      <li key={a.id} className="flex items-center gap-3 px-4 py-3">
-                        <div className="min-w-0 flex-1">
-                          <Link href={`/secretaria/alumnos/${a.id}`} className="block truncate font-semibold hover:underline">{R.nombreCompleto(a)}</Link>
-                          <p className="text-sm text-gris">
-                            {s === 1 ? "Le queda 1 práctica" : "Sin prácticas"}
-                            {pidio && " · ya ha pedido recarga"}
-                          </p>
-                        </div>
-                        <a href={R.enlaceWhatsApp(a.telefono, texto)} target="_blank" rel="noreferrer" className="btn-secundario btn-sm">
-                          <Icono nombre="chat" className="!text-[18px]" /> WhatsApp
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Seccion>
-
-            <Seccion titulo={<>Huecos rellenados <span className="font-normal text-gris">· caza-huecos, últimos 14 días</span></>}>
-              {rellenados.length === 0 ? (
-                <Vacio icono="event_available" titulo="Aún ninguno">Cuando un alumno de la lista de espera coja un hueco, aparecerá aquí.</Vacio>
-              ) : (
-                <ul className="tarjeta divide-y divide-linea">
-                  {rellenados.slice(0, 6).map((o) => {
-                    const quien = R.alumnoPorId(db, o.cogidaPor!)!;
-                    const origen = db.practicas.find((p) => p.id === o.practicaOrigenId);
-                    const cancelo = origen ? R.alumnoPorId(db, origen.alumnoId) : undefined;
-                    const prof = R.profesorPorId(db, o.profesorId)!;
-                    const minutos = o.cogidaEl ? Math.max(1, Math.round((new Date(o.cogidaEl).getTime() - new Date(o.creadaEl).getTime()) / 60000)) : null;
-                    return (
-                      <li key={o.id} className="px-4 py-3">
-                        <p className="font-semibold">
-                          {quien.nombre} cogió el hueco de {cancelo?.nombre ?? "otro alumno"}
-                        </p>
-                        <p className="text-sm text-gris">
-                          {fechaCorta(o.fecha)} a las {o.inicio} con {prof.nombre}
-                          {minutos !== null && ` · en ${minutos < 60 ? `${minutos} min` : `${Math.round(minutos / 60)} h`}`}
-                          {o.abiertaATodos && " · abierto a todos"}
-                        </p>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Seccion>
+              <Seccion titulo={<>Monedero casi vacío <span className="font-normal text-gris">· 1 práctica o ninguna</span></>}>
+                {saldoBajo.length === 0 ? (
+                  <Vacio titulo="Nadie con el monedero vacío" />
+                ) : (
+                  <ul className="tarjeta divide-y divide-linea">
+                    {saldoBajo.slice(0, 5).map((a) => {
+                      const s = R.saldo(db, a.id);
+                      const pidio = solicitudes.some((x) => x.alumnoId === a.id);
+                      const texto = `¡Hola, ${a.nombre}! Te escribimos de Autoescuela Faro: ${s === 1 ? "te queda 1 práctica" : "no te quedan prácticas"} en tu bono. Puedes recargar por Bizum o en la oficina para seguir reservando desde la app.`;
+                      return (
+                        <li key={a.id} className="flex items-center gap-3 px-4 py-3">
+                          <div className="min-w-0 flex-1">
+                            <Link href={`/secretaria/alumnos/${a.id}`} className="block truncate font-semibold hover:underline">{R.nombreCompleto(a)}</Link>
+                            <p className="text-sm text-gris">
+                              {s === 1 ? "Le queda 1 práctica" : "Sin prácticas"}
+                              {pidio && " · ya ha pedido recarga"}
+                            </p>
+                          </div>
+                          <a href={R.enlaceWhatsApp(a.telefono, texto)} target="_blank" rel="noreferrer" className="btn-secundario btn-sm">
+                            <Icono nombre="chat" className="!text-[18px]" /> WhatsApp
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </Seccion>
+            </div>
           </div>
         </div>
 
@@ -300,7 +299,7 @@ export default async function PanelSecretaria() {
                     <Link href={`/secretaria/alumnos/${a.id}#pagos`} className="block px-4 py-3 hover:bg-fondo">
                       <p className="flex items-center justify-between gap-2 font-semibold">
                         <span className="truncate">{R.nombreCompleto(a)}</span>
-                        <span className="cifra shrink-0 text-rojo-600">{eurCorto(total)}</span>
+                        <span className="cifra shrink-0">{eurCorto(total)}</span>
                       </p>
                       <p className="text-sm text-gris">{deudas.map((d) => R.MOTIVOS_DEUDA[d.motivo]).join(" · ")}</p>
                     </Link>
@@ -327,24 +326,6 @@ export default async function PanelSecretaria() {
                 ))}
               </ul>
             )}
-          </Seccion>
-
-          <Seccion titulo="Ocupación esta semana">
-            <div className="tarjeta flex flex-col gap-3 p-4">
-              {db.profesores.map((p) => {
-                const oc = R.ocupacionSemana(db, p.id, diaAgenda);
-                return (
-                  <div key={p.id}>
-                    <p className="mb-1 flex justify-between text-sm">
-                      <span className="font-semibold">{p.nombre}</span>
-                      <span className="cifra text-gris">{oc.porcentaje} % · {oc.ocupadas} de {oc.total} h</span>
-                    </p>
-                    <Barra valor={oc.ocupadas} total={oc.total} />
-                  </div>
-                );
-              })}
-              <p className="text-xs text-gris">De lunes a sábado, 14 clases de 45 minutos al día por profesor.</p>
-            </div>
           </Seccion>
         </aside>
       </div>
